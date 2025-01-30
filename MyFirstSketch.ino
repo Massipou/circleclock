@@ -26,6 +26,18 @@ int greenvar = 0;
 int bluevar = 255;
 int linestep[] = {1, 1, 2, 3};
 
+int kitty[][8] = {
+  {2,7,0},
+  {2,3,4,5,6,7,8},
+  {2,8},
+  {1,3,6,8},
+  {1,9},
+  {1,5,9},
+  {1,8},
+  {2,8},
+  {3,4,5,6,7}
+};
+
 //Objects
 CRGB ledsA[NUM_LEDSA];
 CRGB ledsB[NUM_LEDSB];
@@ -46,7 +58,7 @@ void loop() {
 
 void ledScenario(void ) { /* function ledScenario */
 
-  for (int i = 1; i <= 17; i++) {
+  for (int i = 1; i <= 15; i++) {
 
     // redvar = 0;
     // greenvar = 70;
@@ -54,36 +66,40 @@ void ledScenario(void ) { /* function ledScenario */
 
     // horLine(1,i%7+1,16);
     // horLine(1,i%7+3,16);
-    if (i <= 15 ) {horLine(1, i, 17);}
-    vertLine(i, 1, 15);
+    // pixelMapper(i,5);
+    // vertLine(i, 1, 15);
     // vertLine(17-i+3, 1, 6);
 
     // greenvar = 0;
     // bluevar = 255;
     // redvar = 200;
 
-    // drawDigi(i, 5, 0);
+    //drawDigi(i, 5, 0);
+    drawKitty(i, i);
     // drawDigi(i+3, 1, 1);
     // drawDigi(i+6, 1, 2);
     // drawDigi(i+9, 1, 3);
     // drawDigi(i+12, 1, 4);
 
     FastLED.show();
-    delay(50);
+    delay(100);
     fill_solid(ledsA, NUM_LEDSA, CRGB::Black);
     fill_solid(ledsB, NUM_LEDSA, CRGB::Black);
   }
 }
 
 void pixelMapper(int x, int y) {
+  if (y > 17) {y = y-17;}
+  if (y < 0) {y = y+17;}
   if ((y >= 5) && (y <= 11)) {
     int ry = y - 4;
     int linesize = 16 + (ry-1)%3;
     if (linesize > 17) { linesize = 17; }
     if ( x > linesize) { x = x - 17; }
-    int i = (ry*16 + round((ry-0.5)*2/3)) - linesize + ((ry%2)*2-1) * x + ((ry+1)%2) * (linesize + 1 );
-    ledsA[i-1].setRGB(greenvar, redvar, bluevar);
-
+    if (x > 0) {
+      int i = (ry*16 + round((ry-0.5)*2/3)) - linesize + ((ry%2)*2-1) * x + ((ry+1)%2) * (linesize + 1 );
+      ledsA[i-1].setRGB(greenvar, redvar, bluevar); 
+    }
   } else if ((y > 11) || (y < 5)) {
     int ry;
     int stepIndex;
@@ -154,5 +170,15 @@ void drawDigi(int x, int y, int d) {
   }
   if ((d == 6) || (d == 8)) {
     vertLine(x, y, 6);
+  }
+}
+
+void drawKitty(int x, int y) {
+  for (int i = 0; i <= 8; i++) {
+    for (int j = 0 ; j <= 7; j++) {
+      if (kitty[i][j] != 0) {
+        pixelMapper(kitty[i][j]+x, i+y);
+      }
+    }
   }
 }
