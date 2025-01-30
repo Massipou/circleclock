@@ -38,6 +38,13 @@ int kitty[][8] = {
   {3,4,5,6,7}
 };
 
+int heure[3] = {00,40,18};
+int mod[6] = {60,60,24};
+
+unsigned long startMillis; 
+unsigned long currentMillis;
+const unsigned long period = 1000;
+
 //Objects
 CRGB ledsA[NUM_LEDSA];
 CRGB ledsB[NUM_LEDSB];
@@ -50,6 +57,7 @@ void setup() {
   FastLED.addLeds<LED_TYPE, stripPinA, COLOR_ORDER>(ledsA, NUM_LEDSA);
   FastLED.addLeds<LED_TYPE, stripPinB, COLOR_ORDER>(ledsB, NUM_LEDSB);
   FastLED.setBrightness(  BRIGHTNESS );
+  startMillis = millis();
 }
 
 void loop() {
@@ -57,27 +65,24 @@ void loop() {
 }
 
 void ledScenario(void ) { /* function ledScenario */
-
   for (int i = 1; i <= 15; i++) {
 
-    // redvar = 0;
-    // greenvar = 70;
-    // bluevar = 70;
+    timeCalc();
+    redvar = 0;
+    greenvar = 70;
+    bluevar = 70;
 
-    // horLine(1,i%7+1,16);
-    // horLine(1,i%7+3,16);
-    // pixelMapper(i,5);
-    // vertLine(i, 1, 15);
-    // vertLine(17-i+3, 1, 6);
-
-    // greenvar = 0;
-    // bluevar = 255;
-    // redvar = 200;
-
-    //drawDigi(i, 5, 0);
     drawKitty(i, i);
-    // drawDigi(i+3, 1, 1);
-    // drawDigi(i+6, 1, 2);
+    
+    redvar = 255;
+    greenvar = 0;
+    bluevar = 55;
+
+    drawDigi(3, 5, heure[2]/10);
+    drawDigi(6, 5, heure[2]%10);
+    drawDigi(11, 5, heure[1]/10);
+    drawDigi(14, 5, heure[1]%10);
+    
     // drawDigi(i+9, 1, 3);
     // drawDigi(i+12, 1, 4);
 
@@ -178,6 +183,20 @@ void drawKitty(int x, int y) {
     for (int j = 0 ; j <= 7; j++) {
       if (kitty[i][j] != 0) {
         pixelMapper(kitty[i][j]+x, i+y);
+      }
+    }
+  }
+}
+
+void timeCalc() {
+  currentMillis = millis();
+  if (currentMillis - startMillis >= period) {
+    startMillis = currentMillis;
+    heure[0]++;//incrementation du temps
+    for (int i = 0; i < 3 ; i++){
+      if (heure[i] == mod[i]) { // verification du dépassement de limite
+        if (i<5) {heure[i+1] ++;}
+        heure[i] = 0;
       }
     }
   }
